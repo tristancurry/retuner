@@ -45,9 +45,9 @@
    translate(0,25);
    text("v/b   >>> base frequency DWN/UP",0,0);
    translate(0,25);
-   text("x/c   >>> wobble DWN/UP",0,0);
+   text("-/+   >>> wobble DWN/UP",0,0);
    translate(0,25);
-   text("-/+   >>> trail decay DWN/UP",0,0);
+   text("X/C   >>> trail decay DWN/UP",0,0);
    popMatrix();
    /////STATUS HEADINGS/////
    pushMatrix();
@@ -161,6 +161,6 @@
    text("some kinda Leo - Tristan thing 2014",0,0);
    translate(0,25);
    fill(random(0,255),random(0,255),random(0,255));
-   text("make sure caps lock is off!",0,0);
+   text("have fun, safely now!",0,0);
    popMatrix();
  }

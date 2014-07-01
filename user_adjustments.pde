@@ -9,10 +9,10 @@ if(downKeys[49]){
  }
 
 //BASE FREQUENCY
-if(downKeys[118] && baseFrequency > 0.1){
+if(downKeys[86] && baseFrequency > 0.1){
   baseFrequency = baseFrequency - 0.1;
 }
-if(downKeys[98]){
+if(downKeys[66]){
    baseFrequency = baseFrequency + 0.1;
 }
  baseFrequency = round(baseFrequency*1000);
@@ -20,19 +20,19 @@ if(downKeys[98]){
 
 
 //SNAP RADIUS
-if(downKeys[44] && snapRadius > 0.0005){
+if(downKeys[188] && snapRadius > 0.0005){
   snapRadius = snapRadius - 0.0005;
 }
-if(downKeys[46]){
+if(downKeys[190]){
    snapRadius = snapRadius + 0.0005;
 }
 
 
 //STRENGTH
-if(downKeys[110] && pullFactor > 0.005){
+if(downKeys[78] && pullFactor > 0.005){
   pullFactor = pullFactor - 0.005;
 }
-if(downKeys[109]){
+if(downKeys[77]){
    pullFactor = pullFactor + 0.005;
 }
 
@@ -49,10 +49,10 @@ if(downKeys[61]){
 
 
 //FADE FACTOR
-if(downKeys[120] && fadeFactor > 0){
+if(downKeys[88] && fadeFactor > 0){
   fadeFactor = fadeFactor - 1;
 }
-if(downKeys[99] && fadeFactor < 255){
+if(downKeys[67] && fadeFactor < 255){
    fadeFactor = fadeFactor + 1;
 }
 

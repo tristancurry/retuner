@@ -1,10 +1,10 @@
 //RETUNER! prototype 1
 //Tristan Miller 2014
 /* concept from Leo Auri. Shifts frequencies of played notes to mutually
-arrive at harmonic arrangement (shifting away from equal temperament tuning).
-
-There is also some weird and fun stuff in there. Have fun with this ELECTRONIC TOY  
-*/
+ arrive at harmonic arrangement (shifting away from equal temperament tuning).
+ 
+ There is also some weird and fun stuff in there. Have fun with this ELECTRONIC TOY  
+ */
 
 
 import ddf.minim.Minim;
@@ -52,43 +52,43 @@ int liveNotes = 0; //how many notes are still audible in the list?
 
 
 
-void setup(){   //this is run once when the app is started
+void setup() {   //this is run once when the app is started
 
-  size(900,700);
+  size(900, 700);
   background(0);
   font = loadFont("Amstrad-CPC464-48.vlw");
   frameRate(30);
-  
-  
-  frequencyRange = baseFrequency*pow(2,2) - baseFrequency*pow(2,-1);
-  freqToPixels = (frequencyRange - baseFrequency*pow(2,-octavesBelow))/width;
-  
+
+
+  frequencyRange = baseFrequency*pow(2, 2) - baseFrequency*pow(2, -1);
+  freqToPixels = (frequencyRange - baseFrequency*pow(2, -octavesBelow))/width;
+
   //painstaking mapping of keyboard to be like a piano
 
-  pianoKeys[0] = 97;    //a  A3
-  pianoKeys[1] = 119;   //w  A#3
-  pianoKeys[2] = 115;   //s  B3
-  pianoKeys[3] = 100;   //d  C4
-  pianoKeys[4] = 114;   //r  C#4
-  pianoKeys[5] = 102;   //f  D4
-  pianoKeys[6] = 116;   //t  D#4
-  pianoKeys[7] = 103;   //g  E4
-  pianoKeys[8] = 104;   //h  F4
-  pianoKeys[9] = 117;   //u  F#4
-  pianoKeys[10]= 106;   //j  G4
-  pianoKeys[11] = 105;  //i  G#4
-  pianoKeys[12] = 107;  //k  A4
-  pianoKeys[13] = 111;  //o  A#4
-  pianoKeys[14] = 108;  //l  B4
-  pianoKeys[15] = 59;   //p  C5
-  pianoKeys[16] = 91;   //;  C#5
-  pianoKeys[17] = 39;   //'  D#5   
-  
+  pianoKeys[0] = 65;    //a  A3
+  pianoKeys[1] = 87;   //w  A#3
+  pianoKeys[2] = 83;   //s  B3
+  pianoKeys[3] = 68;   //d  C4
+  pianoKeys[4] = 82;   //r  C#4
+  pianoKeys[5] = 70;   //f  D4
+  pianoKeys[6] = 84;   //t  D#4
+  pianoKeys[7] = 71;   //g  E4
+  pianoKeys[8] = 72;   //h  F4
+  pianoKeys[9] = 85;   //u  F#4
+  pianoKeys[10]= 74;   //j  G4
+  pianoKeys[11] = 73;  //i  G#4
+  pianoKeys[12] = 75;  //k  A4
+  pianoKeys[13] = 79;  //o  A#4
+  pianoKeys[14] = 76;  //l  B4
+  pianoKeys[15] = 59;   //;  C5
+  pianoKeys[16] = 91;   //[  C#5
+  pianoKeys[17] = 222;   //'  D#5   
 
 
 
 
-  
+
+
   minim = new Minim(this);     //instatiate a minim object
   out = minim.getLineOut(Minim.STEREO, 512);    //create a line for output direct to sound card
 
@@ -97,7 +97,7 @@ void setup(){   //this is run once when the app is started
   noteList = new ArrayList(); //instantiate an empty ArrayList to contain the notes as they are created.
 
 
-  for(int i = 0; i < downKeys.length; i++){  //initialise the arrays for tracking which keys are pressed.
+  for (int i = 0; i < downKeys.length; i++) {  //initialise the arrays for tracking which keys are pressed.
     downKeys[i] = false;
     downKeysOld[i] = false;
   }
@@ -106,107 +106,103 @@ void setup(){   //this is run once when the app is started
   redoTunings();
 }
 
-void draw(){  //this function cycles over and over, about 60 times per second if you're lucky.
+void draw() {  //this function cycles over and over, about 60 times per second if you're lucky.
 
- noStroke();            //draw a semitransparent rectangle over the lot...leads to nice motion blurring/trails
- rectMode(CORNER);
- fill(0,0,0,fadeFactor);
- rect(0,0,width,height);
+  noStroke();            //draw a semitransparent rectangle over the lot...leads to nice motion blurring/trails
+  rectMode(CORNER);
+  fill(0, 0, 0, fadeFactor);
+  rect(0, 0, width, height);
 
- cleanupNotes();        //remove notes from the audio stream if they've faded already - then remove from memory (stops weird interference with zero amplitude waves)
- liveNotes = 0;         //reset count of how many living notes there are (dead ones can still be in the noteList
- for(int i = 0; i < noteList.size(); i++){
-   Note thisNote = (Note) noteList.get(i);
-   if(!thisNote.fade){
-     liveNotes ++;
-   }
-   
- }
-  
- if(noteList.size() > 1 && adjustMode){  //do frequency adjustment if this is active and enough notes are held
-  adjustFrequencies();
- }
+  cleanupNotes();        //remove notes from the audio stream if they've faded already - then remove from memory (stops weird interference with zero amplitude waves)
+  liveNotes = 0;         //reset count of how many living notes there are (dead ones can still be in the noteList
+  for (int i = 0; i < noteList.size(); i++) {
+    Note thisNote = (Note) noteList.get(i);
+    if (!thisNote.fade) {
+      liveNotes ++;
+    }
+  }
 
- checkControls();      //scan for user input
+  if (noteList.size() > 1 && adjustMode) {  //do frequency adjustment if this is active and enough notes are held
+    adjustFrequencies();
+  }
+
+  checkControls();      //scan for user input
 
 
- //SILLINESS FOLLOWS - we must always check for silliness//
+  //SILLINESS FOLLOWS - we must always check for silliness//
 
-  if(noteList.size() > 0){
+  if (noteList.size() > 0) {
     silliness();
   }
- 
- if(baseFrequencyOld != baseFrequency){
-  redoTunings();
+
+  if (baseFrequencyOld != baseFrequency) {
+    redoTunings();
   }
-  
- baseFrequencyOld = baseFrequency;
- 
- drawSpectra();
- drawInfoBox();
- 
- //saveFrame("frames/####.png");
+
+  baseFrequencyOld = baseFrequency;
+
+  drawSpectra();
+  drawInfoBox();
+
+  //saveFrame("frames/####.png");
 }
 
 
 
 void keyPressed() {
- if (key<256) {  //if a key is pressed, and its numerical code is less than 256,
-   downKeys[key] = true;  //set the corresponding element of downKeys to 'true'
+  if (keyCode<256) {  //if a key is pressed, and its numerical code is less than 256,
+    downKeys[keyCode] = true;  //set the corresponding element of downKeys to 'true'
     /* for(int i = 0; i< downKeys.length; i++){
      if(downKeys[i]){  
-       println(i);
-       } //this FOR LOOP is optional...it goes through the downKeys array
-         //one entry at a time, and if it encounters a 'true' (which corresponds to a pressed key)
-         //it prints the value of the key to the console (below), using the println() function.
-         //This is useful for working out the numerical code for particular keys.
-         //For instance, 'space' is 32.
-   }*/
-     
- }
+     println(i);
+     } //this FOR LOOP is optional...it goes through the downKeys array
+     //one entry at a time, and if it encounters a 'true' (which corresponds to a pressed key)
+     //it prints the value of the key to the console (below), using the println() function.
+     //This is useful for working out the numerical code for particular keys.
+     //For instance, 'space' is 32.
+     }*/
+  }
 }
 
 void keyReleased() { //this function returns elements of downKeys to 'false'
- if (key<256) {      //if a change in the key's state is detected.
-   downKeys[key] = false;
-   //println(0);
+  if (keyCode<256) {      //if a change in the key's state is detected.
+    downKeys[keyCode] = false;
+    //println(0);
   }
 }
 
 
 
- 
- 
- void drawSpectra(){
-   for(int i = 0; i < defaultTunings.length; i++){
-     pushMatrix();
-       translate(0, height - 50);
-       rectMode(CENTER);
-       noStroke();
-       colorMode(HSB);
-       fill(0,0,255);
-       translate(defaultTunings[i]*freqToPixels, 0);
-       rect(0,0,5,30);
-     popMatrix();
-     
-   }
-   if(noteList.size() > 0){   //this is for displaying the frequencies...
-   int yIndex = 0;
-    for(int i = 0; i < noteList.size(); i++){
+
+
+void drawSpectra() {
+  for (int i = 0; i < defaultTunings.length; i++) {
+    pushMatrix();
+    translate(0, height - 50);
+    rectMode(CENTER);
+    noStroke();
+    colorMode(HSB);
+    fill(0, 0, 255);
+    translate(defaultTunings[i]*freqToPixels, 0);
+    rect(0, 0, 5, 30);
+    popMatrix();
+  }
+  if (noteList.size() > 0) {   //this is for displaying the frequencies...
+    int yIndex = 0;
+    for (int i = 0; i < noteList.size(); i++) {
 
       Note thisNote = (Note) noteList.get(i);
       float yPos = height - (yIndex+2)*50;
-      if(!thisNote.fade){
-      yIndex ++;
-      pushMatrix();
-        translate(0,yPos);
+      if (!thisNote.fade) {
+        yIndex ++;
+        pushMatrix();
+        translate(0, yPos);
         thisNote.drawHarmonics(freqToPixels);
-      popMatrix();
+        popMatrix();
       }
     }
-   }
- }
- 
+  }
+}
 
- 
- 
+
+
